@@ -12,5 +12,4 @@ RUN go build -ldflags="-w -s" -o server ./cmd/server
 FROM scratch as runner
 WORKDIR /
 COPY --from=builder /server ./app ./
-VOLUME [ "./app" ]
 CMD [ "./server" ]
