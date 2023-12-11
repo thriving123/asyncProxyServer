@@ -37,6 +37,9 @@ func Start(host string, port uint16) {
 			"List":  list,
 		})
 	})
-	app.Listen(fmt.Sprintf("%s:%d", host, port))
-	log.Println("web is started")
+	go func() {
+		app.Listen(fmt.Sprintf("%s:%d", host, port))
+		log.Println("web is started")
+	}()
+
 }
