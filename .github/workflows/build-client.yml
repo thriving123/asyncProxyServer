@@ -5,7 +5,7 @@ on:
   - workflow_dispatch
 
 env:
-  IMAGE: thriving123/asyncProxyClient
+  IMAGE: thriving123/async-proxy-client
   REGISTRY: ghcr.io
 
 jobs:
