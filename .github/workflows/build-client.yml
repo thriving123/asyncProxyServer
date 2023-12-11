@@ -1,6 +1,7 @@
 name: Build-Client
 permissions:
-  contents: write
+    contents: read
+    packages: write
 on:
   - workflow_dispatch
 
