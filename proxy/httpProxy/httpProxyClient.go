@@ -5,7 +5,6 @@ import (
 	"asyncProxy/util"
 	"bufio"
 	"crypto/tls"
-	goerrors "errors"
 	"fmt"
 	"log"
 	"net"
@@ -32,17 +31,7 @@ func NewProxy(host string, port uint16) *HttpProxyClient {
 }
 
 // Listen 监听客户端请求
-func (p *HttpProxyClient) Listen() (err error) {
-	defer func() {
-		if r := recover(); r != nil {
-
-			if r, ok := r.(error); ok {
-				err = r
-			} else {
-				err = goerrors.New("unknown error")
-			}
-		}
-	}()
+func (p *HttpProxyClient) Listen() {
 	cert, key, e := common.GenerateFakeCert()
 	util.OkOrPanic(e)
 
