@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	conf := config.NewConfig("./config.yml")
+	conf := config.NewConfig("./app/config.yml")
 	p := httpProxy.NewProxy(conf.Server.HttpHost, conf.Server.HttpPort)
 	go p.Listen()
 	s := socks5Proxy.NewProxy(conf.Server.Socks5Host, conf.Server.Socks5Port)

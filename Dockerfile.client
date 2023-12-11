@@ -11,6 +11,6 @@ RUN go build -ldflags="-w -s" -o client ./cmd/client
 
 FROM scratch as runner
 WORKDIR /
-COPY --from=builder /client /config.yml ./
-VOLUME [ "./config.yml" ]
+COPY --from=builder /client COPY --from=builder /server ./app ./ ./
+VOLUME [ "./app" ]
 CMD [ "./client" ]

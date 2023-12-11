@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	conf := config.NewConfig("./config.yml")
+	conf := config.NewConfig("./app/config.yml")
 	var scheme string
 	if conf.Client.ServerSecure {
 		scheme = "wss"
