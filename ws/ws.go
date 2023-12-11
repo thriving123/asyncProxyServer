@@ -74,6 +74,7 @@ func Start(host string, port uint16, authorization string) {
 	if err := http.ListenAndServe(fmt.Sprintf("%s:%d", host, port), nil); err != nil {
 		log.Panicln("ws 启动异常！")
 	}
+	log.Println("ws 启动成功！")
 
 }
 
