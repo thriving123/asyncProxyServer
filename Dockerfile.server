@@ -1,4 +1,5 @@
 FROM golang:alpine AS builder
+LABEL org.opencontainers.image.source="https://github.com/thriving123/asyncProxyServer"
 LABEL MAINTAINER="ruoli rtsmile"
 WORKDIR /
 
