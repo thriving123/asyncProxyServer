@@ -1,26 +1,37 @@
 package web
 
 import (
+	"asyncProxy/web/views"
 	"asyncProxy/ws"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
+	recover2 "github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/template/html/v2"
 	"log"
+	"net/http"
 )
 
-func Start(host string, port uint16) {
-	engine := html.New("./web/views", ".html")
-	engine.Reload(true)
+func Start(host string, port uint16, username, password string) {
+	engine := html.NewFileSystem(http.FS(views.Views), ".html")
+	engine.Reload(false)
 	engine.Debug(false)
 	engine.Delims("[[", "]]")
 	set := ws.EdgeSet
 	app := fiber.New(fiber.Config{
-		Views: engine,
+		Views:                 engine,
+		DisableStartupMessage: true,
+		ErrorHandler: func(ctx *fiber.Ctx, err error) error {
+			log.Println("web error:", err)
+			return ctx.SendString("error")
+		},
 	})
+	app.Use(recover2.New(recover2.Config{
+		EnableStackTrace: true,
+	}))
 	auth := basicauth.New(basicauth.Config{
 		Users: map[string]string{
-			"admin": "admin",
+			username: password,
 		},
 	})
 	app.Get("/", auth, func(c *fiber.Ctx) error {
@@ -37,9 +48,10 @@ func Start(host string, port uint16) {
 			"List":  list,
 		})
 	})
-	go func() {
-		app.Listen(fmt.Sprintf("%s:%d", host, port))
-		log.Println("web is started")
-	}()
-
+	log.Println("web is started")
+	err := app.Listen(fmt.Sprintf("%s:%d", host, port))
+	if err != nil {
+		log.Fatalln("error while starting http server:", err)
+		return
+	}
 }

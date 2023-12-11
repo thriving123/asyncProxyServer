@@ -11,14 +11,20 @@ import (
 
 func main() {
 	conf := config.NewConfig("./config.yml")
-	addr := fmt.Sprintf("ws://%s:%d/connect", conf.Client.ServerHost, conf.Client.ServerPort)
+	var scheme string
+	if conf.Client.ServerSecure {
+		scheme = "wss"
+	} else {
+		scheme = "ws"
+	}
+	addr := fmt.Sprintf("%v://%s:%d/connect", scheme, conf.Client.ServerHost, conf.Client.ServerPort)
 	for {
 		onCloseSignal := make(chan bool)
 		handler := client.WebsocketHandler{
 			OnCloseSignal: onCloseSignal,
 		}
 
-		wsConnect, _, e := gws.NewClient(&handler, &gws.ClientOption{
+		wsConnect, response, e := gws.NewClient(&handler, &gws.ClientOption{
 			ReadAsyncEnabled: true,
 			CompressEnabled:  true,
 			Recovery:         gws.Recovery,
@@ -29,6 +35,7 @@ func main() {
 		})
 		if e != nil {
 			log.Println("connect error:", e)
+			log.Println("server response code:", response.StatusCode)
 			log.Println("will retry in 10 secs")
 			time.Sleep(10 * time.Second)
 			continue

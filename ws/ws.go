@@ -32,9 +32,6 @@ func (c *Handler) OnClose(socket *gws.Conn, err error) {
 }
 
 func (c *Handler) OnPing(socket *gws.Conn, payload []byte) {
-	if len(payload) > 0 {
-		log.Println("收到Ping消息，内容：", string(payload))
-	}
 	// 返回pong字符串
 	if err := socket.WritePong(payload); err != nil {
 		log.Println("发送Pong消息失败！")
@@ -59,17 +56,21 @@ func Start(host string, port uint16, authorization string) {
 	})
 	http.HandleFunc("/connect", func(writer http.ResponseWriter, request *http.Request) {
 		if request.Header.Get("Authorization") != authorization {
+			writer.Header().Set("WWW-Authenticate", "Invalid request authorization")
 			writer.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 		socket, err := upgrader.Upgrade(writer, request)
 		if err != nil {
-			log.Panicln("ws 连接异常！")
+			log.Println("ws 连接异常！")
+			_, _ = writer.Write([]byte("websocket connect error"))
+			return
 		}
 		go func() {
 			socket.ReadLoop()
 		}()
 	})
+	log.Println("start listen ws")
 	if err := http.ListenAndServe(fmt.Sprintf("%s:%d", host, port), nil); err != nil {
 		log.Panicln("ws 启动异常！")
 	}

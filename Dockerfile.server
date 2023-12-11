@@ -1,0 +1,16 @@
+FROM golang:alpine AS builder
+LABEL MAINTAINER="ruoli rtsmile"
+WORKDIR /
+
+COPY go.mod go.sum ./
+RUN go mod download
+RUN go mod verify
+
+COPY . .
+RUN go build -ldflags="-w -s" -o server ./cmd/server
+
+FROM scratch as runner
+WORKDIR /
+COPY --from=builder /server /config.yml ./
+VOLUME [ "./config.yml" ]
+CMD [ "./server" ]
